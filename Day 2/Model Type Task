@@ -1,0 +1,29 @@
+EY Application: Anomaly detection in invoices
+Model Type: SVM
+Primary Metric: Recall
+Why this Metric: False Negative is Costly
+
+EY Application: Spam classification in audit emails
+Model Type: Naive Bayes
+Primary Metric: Recall
+Why this Metric: False Negative is Costly
+
+EY Application: Predicting deal close probability
+Model Type: Logistic Regression
+Primary Metric: ROC-AUC
+Why this Metric: Probability based, so curve helps
+
+EY Application: Summarising 100-page contracts
+Model Type: LL Summariser
+Primary Metric: Rouge
+Why this Metric: Summary task, captures key sequences
+
+EY Application: Translating audit reports
+Model Type: GPT-based model
+Primary Metric: BLUE
+Why this Metric: measures translation accuracy
+
+EY Application: Flagging revenue forecasting errors
+Model Type: Anomaly Detection
+Primary Metric: Recall
+Why this Metric: False negatives are costly

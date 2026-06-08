@@ -1,0 +1,23 @@
+A. Patient Web Portal
+Classification: App Gateway
+Key Deciding Factor: Several transactions happen over public internet and SSL termination is needed.
+
+B. Clinical API (Internal)
+Classification: Load Balancer
+Key Deciding Factor: TCP protocol and internal network.
+
+C. DICOM Image Streaming
+Classification: Load Balancer
+Key Deciding Factor: non-HTTP protocol is used and a simple requirement.
+
+D. Auth Service (Header routing)
+Classification: App Gateway
+Key Deciding Factor: HTTP requests over public networks and security is needed.
+
+E. Legacy SOAP Lab Service
+Classification: Load Balancer
+Key Deciding Factor: Minimal config is needed and only TCP is used without public internet exposure.
+
+F. Admin dashboard (hostname)
+Classification: App Gateway
+Key Deciding Factor: It has public internet exposure with HTTPS requests.

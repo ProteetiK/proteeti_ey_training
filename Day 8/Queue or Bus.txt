@@ -2,22 +2,34 @@ A. Settlement Command
 Classification: Queue
 Key Deciding Factor: Exactly one ledger needs to process this and only once
 
+|| Settlement Command -> Queue -> Ledger ||
+
 B. Payment Received Broadcast
 Classification: Bus
 Key Deciding Factor: Many unknown consumers must react ot the same event
+
+|| Payment Received -> Bus -> {Customer 1, 2, 3...} ||
 
 C. SMS/Push notifications
 Classification: Bus
 Key Deciding Factor: Many unknown consumers must react ot the same event
 
+|| New notification -> Bus -> {Customer 1, 2, 3...} ||
+
 D. Fraud Score Request
 Classification: Queue
 Key Deciding Factor: Exactly one consumer needs to see this
+
+|| Payment Record -> Queue -> Fraud Detection Engine ||
 
 E. Account State Change Events
 Classification: Queue
 Key Deciding Factor: Exactly one consumer needs to see this
 
+|| Account State Change Notification -> Queue -> Relevant Customer ||
+
 F. End-of-day Reconciliation
 Classification: Queue
 Key Deciding Factor: Only one worker must process all the files 
+
+|| Reconciliation Files -> Queue -> Worker in Charge ||

@@ -1,0 +1,2 @@
+expected_interval_ms,mean_interval_ms,std_interval_ms,min_interval_ms,max_interval_ms,gap_count,gap_duration_ms,repeated_timestamp_count,non_monotonic_count
+20.0,19.88493667475074,5.968155803734252,0.0,43.0,543,17906.0,54,0

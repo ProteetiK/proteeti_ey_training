@@ -1,0 +1,777 @@
+```text
+You are a Senior Time Series Data Scientist and Python Engineer specializing in signal analytics, exploratory time-series analysis, statistical diagnostics, forecasting preparation, and automated feature engineering.
+
+Your task is to build a SINGLE end-to-end automated time-series analysis pipeline for the provided CSV dataset.
+
+The pipeline must:
+
+1. Validate time continuity.
+2. Analyze and handle missing values.
+3. Generate time-series visualizations.
+4. Detect trend, seasonality, and outliers.
+5. Generate weekly/monthly boxplots.
+6. Perform stationarity testing.
+7. Generate and interpret ACF/PACF.
+8. Recommend feature engineering.
+9. Save all outputs, reports, plots, and summary artifacts.
+
+The pipeline should run without manual intervention and generate publication-quality outputs.
+
+===========================================================
+INPUT DATASET
+===========================================================
+
+Dataset columns:
+
+- seq
+- timestamp_ms
+- red
+- ir
+- red_corrected
+- ir_corrected
+
+Use:
+
+timestamp_ms
+
+as the primary time index.
+
+Analyze the following signals independently:
+
+[
+    "red",
+    "ir",
+    "red_corrected",
+    "ir_corrected"
+]
+
+===========================================================
+STEP 1: DATASET UNDERSTANDING
+===========================================================
+
+Load the CSV.
+
+Generate:
+
+- Dataset shape
+- Column names
+- Data types
+- First 10 rows
+- Last 10 rows
+
+Run:
+
+df.info()
+
+df.describe(include="all")
+
+Check:
+
+- Duplicate rows
+- Duplicate timestamps
+- Duplicate sequence IDs
+
+Generate a dataset summary table.
+
+===========================================================
+STEP 2: TIME CONTINUITY CHECK
+===========================================================
+
+Convert timestamp_ms into datetime.
+
+Sort by timestamp.
+
+Create:
+
+delta_t = timestamp.diff()
+
+Compute:
+
+- Mean sampling interval
+- Median sampling interval
+- Standard deviation interval
+- Minimum interval
+- Maximum interval
+
+Determine:
+
+- Expected interval
+- Actual interval distribution
+- Missing timestamps
+- Timestamp gaps
+- Timestamp jumps
+- Repeated timestamps
+- Non-monotonic timestamps
+
+Generate a continuity report containing:
+
+- Expected Interval
+- Observed Interval
+- Gap Count
+- Gap Locations
+- Gap Duration
+- Repeated Timestamp Count
+
+Create a continuity visualization.
+
+===========================================================
+STEP 3: MISSING VALUE ANALYSIS
+===========================================================
+
+For every column calculate:
+
+- Missing Count
+- Missing Percentage
+
+Generate:
+
+1. Missing Value Table
+
+2. Missing Value Heatmap
+
+3. Missing Matrix
+
+4. Consecutive Missing Segment Report
+
+For each missing block identify:
+
+- Column
+- Start Timestamp
+- End Timestamp
+- Length
+
+===========================================================
+STEP 4: MISSING VALUE TREATMENT
+===========================================================
+
+Create an automated imputation strategy.
+
+Rules:
+
+IF missing % < 1%
+    -> Forward Fill
+
+IF missing % >= 1% and <= 5%
+    -> Linear Interpolation
+
+IF missing % > 5% and <= 20%
+    -> Time-based Interpolation
+
+IF missing % > 20%
+    -> Flag for Manual Review
+
+Generate report:
+
+Column
+Missing Count
+Missing %
+Method Used
+Reason
+
+Create:
+
+df_imputed
+
+Save imputed dataset.
+
+===========================================================
+STEP 5: TIME SERIES VISUALIZATION
+===========================================================
+
+For each signal:
+
+red
+ir
+red_corrected
+ir_corrected
+
+Generate:
+
+1. Full Time Series Plot
+
+Timestamp vs Signal
+
+2. Rolling Mean
+
+Windows:
+
+- 50
+- 100
+- 500
+
+3. Rolling Standard Deviation
+
+Windows:
+
+- 50
+- 100
+- 500
+
+4. Histogram
+
+5. KDE Plot
+
+6. Distribution Plot
+
+Save all figures.
+
+===========================================================
+STEP 6: TREND DETECTION
+===========================================================
+
+For each signal:
+
+Apply:
+
+1. Rolling Mean Trend
+
+2. LOWESS Trend Smoothing
+
+3. Linear Regression Trend
+
+Estimate:
+
+- Slope
+- Intercept
+- R²
+
+Classify trend:
+
+- Increasing
+- Decreasing
+- No Trend
+
+Calculate:
+
+Trend Strength
+
+Create Trend Summary Table.
+
+===========================================================
+STEP 7: SEASONALITY DETECTION
+===========================================================
+
+Automatically infer sampling frequency.
+
+Perform FFT analysis.
+
+Calculate:
+
+- Dominant Frequency
+- Dominant Period
+
+Perform Seasonal Decomposition.
+
+Use:
+
+statsmodels.seasonal_decompose()
+
+Evaluate multiple candidate periods.
+
+For each signal calculate:
+
+- Dominant Period
+- Seasonal Strength
+- Trend Strength
+- Residual Strength
+
+Generate decomposition plots.
+
+Save all decomposition outputs.
+
+===========================================================
+STEP 8: OUTLIER DETECTION
+===========================================================
+
+Detect outliers using multiple methods.
+
+METHOD 1:
+
+Z-score
+
+Threshold:
+
+|z| > 3
+
+METHOD 2:
+
+IQR
+
+Lower = Q1 - 1.5×IQR
+
+Upper = Q3 + 1.5×IQR
+
+METHOD 3:
+
+Isolation Forest
+
+Generate:
+
+Outlier Report:
+
+- Timestamp
+- Signal
+- Value
+- Detection Method
+
+Generate plots with outliers highlighted.
+
+Save all outputs.
+
+===========================================================
+STEP 9: BOXPLOTS
+===========================================================
+
+Generate:
+
+1. Monthly Boxplots
+
+If multiple months exist.
+
+Otherwise:
+
+Use nearest valid aggregation.
+
+2. Weekly Boxplots
+
+Using:
+
+week_of_year
+
+If duration is too short:
+
+Generate:
+
+- Hourly boxplots
+- Daily boxplots
+- Fixed-window chunk boxplots
+
+Include:
+
+- Median
+- IQR
+- Whiskers
+- Outliers
+
+Save plots.
+
+===========================================================
+STEP 10: STATIONARITY TESTING
+===========================================================
+
+For each signal run:
+
+ADF Test
+
+adfuller()
+
+Report:
+
+- ADF Statistic
+- p-value
+- Critical Values
+- Conclusion
+
+Run:
+
+KPSS Test
+
+kpss()
+
+Report:
+
+- KPSS Statistic
+- p-value
+- Conclusion
+
+Determine:
+
+- Stationary
+- Non-Stationary
+- Trend Stationary
+- Differencing Required
+
+===========================================================
+STEP 11: DIFFERENCING ANALYSIS
+===========================================================
+
+If signal is non-stationary:
+
+Apply:
+
+1st Difference
+
+Re-run:
+
+- ADF
+- KPSS
+
+If still non-stationary:
+
+Apply:
+
+2nd Difference
+
+Re-run:
+
+- ADF
+- KPSS
+
+Determine minimum differencing order.
+
+Store results.
+
+===========================================================
+STEP 12: ACF / PACF ANALYSIS
+===========================================================
+
+For each signal generate:
+
+ACF
+
+Lag = 100
+
+PACF
+
+Lag = 100
+
+Interpret:
+
+- Persistence
+- Exponential Decay
+- Seasonal Spikes
+- Significant Lags
+
+Recommend:
+
+Suggested p
+Suggested d
+Suggested q
+
+Generate summary table.
+
+Save plots.
+
+===========================================================
+STEP 13: FEATURE ENGINEERING
+===========================================================
+
+Create a Feature Engineering Inventory.
+
+TIME FEATURES
+
+Generate:
+
+- hour
+- minute
+- second
+- millisecond
+- day
+- week
+- month
+- quarter
+
+LAG FEATURES
+
+For every signal create:
+
+- lag_1
+- lag_2
+- lag_3
+- lag_5
+- lag_10
+- lag_20
+- lag_50
+
+ROLLING FEATURES
+
+Windows:
+
+5
+10
+20
+50
+100
+
+Create:
+
+- rolling_mean
+- rolling_std
+- rolling_min
+- rolling_max
+- rolling_median
+
+CHANGE FEATURES
+
+Create:
+
+- difference_1
+- difference_2
+- pct_change
+
+SIGNAL FEATURES
+
+Create:
+
+- energy
+- RMS
+- amplitude
+- peak_to_peak
+
+FREQUENCY FEATURES
+
+Using FFT create:
+
+- dominant_frequency
+- dominant_period
+- spectral_entropy
+
+Generate a complete feature inventory table.
+
+===========================================================
+STEP 14: FINAL REPORT
+===========================================================
+
+Generate a detailed markdown report.
+
+Include:
+
+===========================================================
+DATASET SUMMARY
+===========================================================
+
+- Row Count
+- Column Count
+- Dataset Duration
+- Sampling Interval
+
+===========================================================
+TIME CONTINUITY FINDINGS
+===========================================================
+
+- Missing Timestamps
+- Gaps
+- Irregular Intervals
+- Repeated Timestamps
+
+===========================================================
+MISSING VALUE FINDINGS
+===========================================================
+
+- Missing %
+- Imputation Strategy
+- Reason
+
+===========================================================
+TREND FINDINGS
+===========================================================
+
+For each signal:
+
+- Trend Direction
+- Trend Strength
+- Regression Slope
+- R²
+
+===========================================================
+SEASONALITY FINDINGS
+===========================================================
+
+For each signal:
+
+- Dominant Frequency
+- Dominant Period
+- Seasonal Strength
+
+===========================================================
+OUTLIER FINDINGS
+===========================================================
+
+For each signal:
+
+- Outlier Count
+- Outlier %
+- Detection Methods
+
+===========================================================
+STATIONARITY FINDINGS
+===========================================================
+
+For each signal:
+
+- ADF Result
+- KPSS Result
+- Stationary?
+- Differencing Required
+
+===========================================================
+ACF/PACF FINDINGS
+===========================================================
+
+For each signal:
+
+- Suggested p
+- Suggested d
+- Suggested q
+
+===========================================================
+FEATURE ENGINEERING SUMMARY
+===========================================================
+
+List every engineered feature.
+
+===========================================================
+SAVE ALL OUTPUTS
+===========================================================
+
+Create folder:
+
+output/
+
+===========================================================
+TABLES
+===========================================================
+
+1. feature_engineering_inventory.csv
+
+Columns:
+
+- Feature Name
+- Feature Type
+- Description
+
+-----------------------------------------------------------
+
+2. missing_value_report.csv
+
+Columns:
+
+- Column
+- Missing Count
+- Missing %
+- Strategy Used
+- Reason
+
+-----------------------------------------------------------
+
+3. time_continuity_report.csv
+
+Columns:
+
+- Expected Interval
+- Observed Interval
+- Gap Count
+- Gap Duration
+
+-----------------------------------------------------------
+
+4. stationarity_report.csv
+
+Columns:
+
+- Column
+- ADF Statistic
+- ADF p-value
+- KPSS Statistic
+- KPSS p-value
+- Stationary
+- Differencing Required
+
+-----------------------------------------------------------
+
+5. trend_seasonality_report.csv
+
+Columns:
+
+- Column
+- Trend Direction
+- Trend Strength
+- Seasonality Detected
+- Dominant Frequency
+- Dominant Period
+
+===========================================================
+PLOTS
+===========================================================
+
+Save:
+
+timeseries_red.png
+timeseries_ir.png
+timeseries_red_corrected.png
+timeseries_ir_corrected.png
+
+-----------------------------------------------------------
+
+decomposition_red.png
+decomposition_ir.png
+decomposition_red_corrected.png
+decomposition_ir_corrected.png
+
+-----------------------------------------------------------
+
+acf_red.png
+pacf_red.png
+
+acf_ir.png
+pacf_ir.png
+
+acf_red_corrected.png
+pacf_red_corrected.png
+
+acf_ir_corrected.png
+pacf_ir_corrected.png
+
+-----------------------------------------------------------
+
+outliers_red.png
+outliers_ir.png
+outliers_red_corrected.png
+outliers_ir_corrected.png
+
+-----------------------------------------------------------
+
+weekly_boxplot.png
+
+monthly_boxplot.png
+
+(or nearest valid aggregation level)
+
+===========================================================
+FINAL DELIVERABLES
+===========================================================
+
+Generate:
+
+1. EDA_Report.md
+
+2. analysis_summary.json
+
+The JSON must contain:
+
+{
+  "feature_engineering_columns": [],
+  "missing_value_summary": [],
+  "time_continuity_summary": {},
+  "trend_summary": {},
+  "seasonality_summary": {},
+  "stationarity_summary": {},
+  "acf_summary": {},
+  "pacf_summary": {},
+  "generated_plot_paths": []
+}
+
+===========================================================
+IMPORTANT REQUIREMENTS
+===========================================================
+
+- Use robust error handling.
+- Automatically infer sampling frequency.
+- Automatically handle short-duration datasets.
+- Automatically select valid decomposition periods.
+- Generate publication-quality plots.
+- Use reproducible random seeds where required.
+- Ensure all outputs are saved successfully.
+- Produce concise interpretations after every analysis step.
+- At the end, provide an executive summary with actionable insights for forecasting/model development.
+```

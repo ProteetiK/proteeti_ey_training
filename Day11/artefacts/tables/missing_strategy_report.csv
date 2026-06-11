@@ -1,0 +1,8 @@
+Column,Strategy Used,Reason
+seq,Forward Fill,<1% Missing
+timestamp_ms,Forward Fill,<1% Missing
+red,Forward Fill,<1% Missing
+ir,Forward Fill,<1% Missing
+red_corrected,Forward Fill,<1% Missing
+ir_corrected,Forward Fill,<1% Missing
+datetime,Forward Fill,<1% Missing

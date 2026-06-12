@@ -1,0 +1,57 @@
+HealthBot: Clinical RAG at Enterprise Scale
+
+1. Azure AI Search (Hybrid): It provides native HIPAA compliance and provides hybrid retrieval support. However, it offers less options for customisation.
+
+2. Chunk Size - 256 and 1024 hierarchical tokening: The clinical domain has data which is usually very sensitive and high accuracy is needed. Hence, a hybrid model will be beneficial where information can first be retrived in 256 token chunks, and then they can be sent to the 1024 parent chunks which can be then reranked and sent to the LLM.
+
+3. Since we have a 2M+ pages of context available to pick from, we must maintain a RAG pipeline to avoid a huge cost that will come with sending this entire context in one chunk to Claude. We can skip the RAG for small, frequently raised queries. We can use an inteligent routing strategy to use or skip RAG based on the specific workflow.
+
+4. Domain-specific indexing with query routing improves speed.
+
+Block Diagram
+
+                        -----------------------
+                        |  Query in Portal    |
+                        -----------------------
+                                   |
+                                   v
+                        -----------------------
+                        | 	  API Gateway 	  |
+                        -----------------------
+                                   |
+                                   v
+                        -----------------------
+                        |     Query Router    |
+                        -----------------------
+                                   |
+				------------------------------------------
+				|                       				 |                       
+				v                       			   	 v                       
+		------------------    					------------------    
+		| Cardiology     |    					| Oncology       |    
+		| Index          |    					| Index          |    
+		------------------    					------------------    
+					|                     				|                     
+					-------------------------------------
+									|
+									v
+						-----------------------
+						| Azure AI Search     |
+						| Hybrid Retrieval    |
+						-----------------------
+									|
+									v
+						-----------------------
+						| 		Claude        |
+						-----------------------
+									|
+									v
+						-----------------------
+						| Citation Validation |
+						| Safety Layer        |
+						-----------------------
+									|
+									v
+						-----------------------
+						| 	Bot Response      |
+						-----------------------

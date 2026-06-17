@@ -1,0 +1,29 @@
+Framework: LangChain + LlamaIndex
+
+Step 1:
+Use LangChain to build an email-processing pipeline that ingests the 10,000 daily support emails and performs automatic email classification (e.g., delivery issue, refund request, shipment delay, damaged goods).
+
+Step 2:
+Store company policy documents in a vector database indexed through LlamaIndex. For each classified email, perform semantic retrieval of the most relevant policy documents.
+
+Step 3:
+Use a Retrieval-Augmented Generation (RAG) workflow where the retrieved policies are provided to the LLM to generate a draft customer reply.
+
+Step 4:
+Use LangChain agents/tools to evaluate confidence or complexity. If the case is complex, sensitive, or has low confidence, trigger the ticketing API and route the email to a human support agent.
+
+Justification:
+
+LangChain provides strong orchestration capabilities for multi-step workflows, LLM chains, agents, and API integrations.
+LlamaIndex specializes in document indexing and retrieval, making it ideal for searching policy documents efficiently.
+The combination supports a scalable RAG architecture for generating accurate responses based on company policies.
+LangChain's tool-calling capabilities make it easy to integrate with external ticketing systems for human escalation.
+This architecture separates workflow orchestration (LangChain) from knowledge retrieval (LlamaIndex), improving maintainability and performance.
+
+High-Level Architecture:
+- Incoming customer emails -> Email ingestion service.
+- LangChain classification chain categorizes each email.
+- LlamaIndex retrieves relevant policy documents from the knowledge base.
+- LLM + retrieved policies generate a draft response (RAG).
+- Confidence/complexity check determines whether escalation is needed.
+- Simple cases -> draft reply sent; complex cases -> ticket created through ticketing API and assigned to a human agent.

@@ -1,0 +1,125 @@
+=== SECTION A — PROBLEM STATEMENT ===
+ 
+A1. Ingest: We ingest raw data and pass it on. (PDF Documents are uploaded and the text is passed to the next step as a page-by-page list).
+Structure: Here raw data is converted to structured form (We convert the list into a dataframe) to pass to the next step.
+Store: Here we define the data storage details for the LLM input and output. (A directory structure made where at runtime an output folder is created)
+Summarise: An LLM call is placed here to get desired summary. (We then use a Groq model to generate summary from the stored content)
+Visualise: A visualisation is made from the output of previous stages. (A bar chart comparing the number of words in each page)
+ 
+ 
+=== SECTION B — ARCHITECTURE DIAGRAM ===
+ 
+B1. (Turn on logging) 
+|
+v
+PDF initial data 
+|
+v 
+Ingested via PyMuPDF (List by page) (Ingestion) 
+|
+v
+Converted to structured DataFrame['pg_no','word_count','1st_50_char'] 
+|
+v
+Output directory Created (Store) 
+|
+v
+LLM call to Groq Llama 3.1-8b-instant model to get summary (Summarise) 
+|
+v
+Used MatPlotLib to visualize Bar Plot on List Data
+ 
+=== SECTION C — CODE BLOCKS ===
+ 
+C1. 
+```
+#C1
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+```
+ 
+C2.
+```
+#C2
+import pymupdf
+pdf_path = "./data/report.pdf"
+page_texts = []
+
+with pymupdf.open(pdf_path) as doc:
+  for page_num in range(len(doc)):
+    page = doc[page_num]
+    text = page.get_text()
+    page_texts.append(text)
+    logger.info(f'Extracted page {page_num}.')
+logger.info(f'Collected pdf.')
+```
+ 
+C3. 
+```
+#C3
+import pandas as pd
+df = pd.DataFrame([
+    {
+        "page_no": page_num + 1,
+        "word_count": len(text.split()),
+        "first_50_chars": text[:50].replace("\n", " ")
+    }
+    for page_num, text in enumerate(page_texts)
+])
+df
+```
+ 
+C4.
+```
+os.makedirs("output", exist_ok=True)
+df.to_csv("output/pages.csv", index=False)
+df.to_json("output/pages.json", orient="records")
+``` 
+
+C5.
+```
+from groq import Groq
+GROQ_API_KEY = ""
+client = Groq(api_key=GROQ_API_KEY)
+doc_text = "\n".join(page_texts)
+doc_to_pass = doc_text[:2000]
+response = client.chat.completions.create(
+    model="llama-3.1-8b-instant",
+    messages=[
+        {
+          "role": "user",
+          "content": f"""
+            Summarise the document in exactly 3 bullet points: {doc_to_pass}
+          """
+        }
+    ]
+)
+summary = response.choices[0].message.content
+print(summary)
+```
+ 
+C6.
+```
+import matplotlib.pyplot as plt
+plt.figure(figsize=(6,4))
+plt.bar(df["page_no"], df["word_count"])
+plt.title("Word Count vs Pages")
+plt.xlabel("Page Number")
+plt.ylabel("Word Count")
+plt.show()
+```
+ 
+=== SECTION D — EXPECTED GROQ RESPONSE SHAPE ===
+ 
+D1. The response will be a ChatCompletion object with several fields such as the chat Id, choices, message (actual response), role, annotations, tool execution details, function calls, reasonings, model details, service tier etc. It will also provide the token usage (682 in this case), completion times and other execution details such as promt, queue times, usage breakdowns and seed. The actual response will comprise of three sentences given in a bull-point structure, covering the important details of the file which was sent as the prompt (in our case, for the Assignment pdf, it is likely to note the database details that the students are expected to create, the schema details of the same and the constraints the students are expected to adhere to).
+
+ 
+=== SECTION E — LESSONS LEARNED ===
+ 
+E1. Building the end-to-end pipeline following the instructions was easy in Google Colab. The modules used were easy to grasp and use. It did take some time typing the code in the virtual machine, given the performance lags. The PyMuPDF module did not work with a fitz call, where I had to change the file reader to a direct pymupdf.open() statement. 
+Before we go to production, we must employ strict testing routines and ensure sufficient guardrails are erected around the model. To do this we should ensure that there's a constant feedback loop which evaluates model output and ensures that they are up to the given production standards.

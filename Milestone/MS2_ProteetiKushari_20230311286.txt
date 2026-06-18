@@ -1,0 +1,331 @@
+A1. This is a FastAPI based microservice that generates summaries of text blocks provided to it as input using an LLM. It exposes a POST endpoint called summarise which returns a JSON response with the generated summary.
+The request flow starts when the user (client) sends a request to this API. The request passes through the middleware where it gains a unique request id and records its latency. Additionally, in this step the request is also logged and its metrics are recorded by Prometheus. After this the payload's structure, including the message length and style of summary requested, is validated by Pydantic. After this we send the request to Groq (since OpenAI key is not working) and we get a JSON response. The tradeoff made here was the use of synchronous LLM calls. This approach simplifies our code but in times of high demand, response times might be high.
+ 
+B1. ```
+service_name: doc-summarization-api
+port: 8000
+log_level: INFO
+
+llm:
+  provider: openai
+  model: gpt-4o-mini
+  max_tokens: 300
+  #provider: groq
+  #model: llama-3.3-70b-versatile
+  #max_tokens: 300
+```
+ 
+B2. ```
+from pathlib import Path
+from typing import Literal
+
+import yaml
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class LLMConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    provider: Literal["openai", "azure_openai", "anthropic", "groq"]
+    model: str
+    max_tokens: int = Field(gt=0)
+
+
+class AppConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    service_name: str
+    port: int = Field(gt=0, le=65535)
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"]
+    llm: LLMConfig
+
+
+def load_config(path: str | Path) -> AppConfig:
+    path = Path(path)
+
+    with path.open("r", encoding="utf-8") as f:
+        raw_config = yaml.safe_load(f)
+
+    return AppConfig.model_validate(raw_config)
+```
+ 
+C1. ```
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+
+class SummariseRequest(BaseModel):
+    text: str = Field(
+        min_length=20,
+        description="Document text to be summarised"
+    )
+    style: Literal["brief", "detailed"]
+
+
+class SummariseResponse(BaseModel):
+    summary: str
+    model: str
+    input_chars: int
+```
+
+D1. ```
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException
+from openai import OpenAI
+
+config: AppConfig | None = None
+llm_client: OpenAI | None = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global config, llm_client
+
+    config = load_config("config.yaml")
+    llm_client = OpenAI()
+
+    yield
+
+
+app = FastAPI(
+    title="Document Summarisation API",
+    lifespan=lifespan,
+)
+
+
+@app.post(
+    "/summarize",
+    response_model=SummariseResponse,
+)
+async def summarize(request: SummariseRequest) -> SummariseResponse:
+    if config is None or llm_client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not initialized",
+        )
+
+    if request.style == "brief":
+        prompt = f"""
+Summarise the following text.
+
+Requirements:
+- Return exactly 2 bullet points.
+- Maximum 20 words per bullet.
+- Focus only on the most important information.
+
+Text:
+{request.text}
+"""
+    else:
+        prompt = f"""
+Summarise the following text.
+
+Requirements:
+- Produce exactly 3 paragraphs.
+- Include key points, supporting details, and conclusions.
+- Use clear and professional language.
+
+Text:
+{request.text}
+"""
+
+    try:
+        response = llm_client.chat.completions.create(
+            model=config.llm.model,
+            max_tokens=config.llm.max_tokens,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert document summarization assistant.",
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+        )
+
+        summary_text = response.choices[0].message.content.strip()
+
+        return SummariseResponse(
+            summary=summary_text,
+            model=config.llm.model,
+            input_chars=len(request.text),
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"LLM request failed: {exc}",
+        )
+```
+ 
+E1. ```
+import logging
+import time
+from uuid import uuid4
+
+from fastapi import Request
+from prometheus_client import Counter
+
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "path"],
+)
+
+
+@app.middleware("http")
+async def request_logging_middleware(
+    request: Request,
+    call_next,
+):
+    request_id = str(uuid4())
+    start_time = time.perf_counter()
+
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+    except Exception:
+        status_code = 500
+        raise
+    finally:
+        duration_ms = (
+            time.perf_counter() - start_time
+        ) * 1000
+
+        path = request.url.path
+        method = request.method
+
+        REQUEST_COUNT.labels(
+            method=method,
+            path=path,
+        ).inc()
+
+        logging.info(
+            "request_id=%s method=%s path=%s status_code=%s duration_ms=%.2f",
+            request_id,
+            method,
+            path,
+            status_code,
+            duration_ms,
+        )
+
+    response.headers["X-Request-ID"] = request_id
+    return response
+```
+ 
+E2. ```
+from fastapi import Response, status
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+
+# Set during application startup
+is_ready = False
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global config, llm_client, is_ready
+
+    config = load_config("config.yaml")
+    llm_client = OpenAI()
+
+    is_ready = True
+
+    yield
+
+    is_ready = False
+
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "alive"}
+
+
+@app.get("/readyz")
+async def readyz():
+    if not is_ready:
+        return Response(
+            content='{"status":"not_ready"}',
+            media_type="application/json",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    return {"status": "ready"}
+
+
+@app.get("/metrics")
+async def metrics():
+    return Response(
+        content=generate_latest(),
+        media_type=CONTENT_TYPE_LATEST,
+    )
+```
+
+ 
+F1. ```
+from unittest.mock import MagicMock, patch
+
+from fastapi.testclient import TestClient
+
+from app import app
+
+client = TestClient(app)
+
+
+def test_summarize_happy_path_with_mocked_llm():
+    mock_response = MagicMock()
+    mock_response.choices = [
+        MagicMock(
+            message=MagicMock(
+                content="Mocked summary"
+            )
+        )
+    ]
+
+    with patch(
+        "app.llm_client.chat.completions.create",
+        return_value=mock_response,
+    ):
+        response = client.post(
+            "/summarize",
+            json={
+                "text": (
+                    "This is a sufficiently long document text "
+                    "containing more than twenty characters."
+                ),
+                "style": "brief",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["summary"] == "Mocked summary"
+
+
+def test_summarize_invalid_style_returns_422():
+    response = client.post(
+        "/summarize",
+        json={
+            "text": (
+                "This is a sufficiently long document text "
+                "containing more than twenty characters."
+            ),
+            "style": "unknown",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_healthz_returns_200_alive():
+    response = client.get("/healthz")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "alive"
+    }
+```
+ 
+G1. The integration of the different components (FastAPI, Pydantic and the LLM (Groq used since OpenAI key isn't up)) was smooth and the implementation went on without a hitch. Testing the app on my local took some time, and was the only pain point in the project, as I had to create a working project structure for this microservice to be up as an app where I could actually see the system in action. If the system is deployed to production, the MLOps practice most important would be the implementation of health observability. Since, in that case this would become a customer-facing service, it would be very important to keep an eye on it, to ensure either no or minimal downtime, so that users are comfortable with using it.

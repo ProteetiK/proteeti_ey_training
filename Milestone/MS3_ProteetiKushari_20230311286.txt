@@ -1,0 +1,761 @@
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)  Marks: 100 | Duration: 2 Hours
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+MILESTONE ASSESSMENT 3
+Generative AI Industry Collaboration
+Days 11 – 15
+Duration: 2 Hours | Total Marks: 100
+
+Date: ____________________
+Candidate Name: ____________________________
+Batch / Roll No.: ____________________
+Assessor: ____________________________
+
+ASSESSMENT OVERVIEW
+Section
+Topic Coverage
+Marks
+Time
+Section A
+Short Answer Questions (Days 11–15)
+25
+35 min
+Section B
+Case Study & Applied Analysis
+35
+40 min
+Section C
+Hands-On / Code Task
+40
+45 min
+TOTAL
+
+100
+120 min
+
+GENERAL INSTRUCTIONS
+1. Read all questions carefully before answering.
+2. This is a closed-book assessment unless otherwise instructed by the assessor.
+3. For code tasks, clearly comment your logic. Partial credit is awarded for correct reasoning.
+4. Use of IDE auto-complete tools is permitted only in Section C unless stated otherwise.
+5. Time allocation is advisory; manage your time accordingly.
+6. Answers must be written/typed in the designated response areas.
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+SECTION A — Short Answer Questions
+Instructions: Answer ALL five questions. Each question carries 5 marks. Answers should be concise (4–8 sentences or equivalent).
+Total: 25 Marks | Suggested Time: 35 Minutes
+Day 11
+Q21. (5 marks) Explain the difference between a zero-shot, one-shot, and few-shot prompt. Using a classification task as your example, describe when you would choose few-shot over zero-shot, and what trade-offs you consider.
+Answer:
+In a zero-shot prompt, we provide only instructions and no examples, and the model relies only on its own internal training data. 
+One-shot prompt is when we only provide a single example to the model, in addition to it being expected to use its own training. 
+In Few-shot Prompting, we provide multiple examples to the model so it can learn from that as well. Multiple examples help the model notice patterns, edge cases, and labeling conventions.
+Few-shot prompting is useful when the task is ambiguous or domain-specific. For example, if we have to classify an IT support ticket into custom categories such as "Software" "Hardware" or "Bug". Examples clarify what each category means and promotes output consistency for the model. However, for few-shot prompts, the prompt length is longer and hence more tokens are consumed and latency increases.
+
+Day 12
+Q22. (5 marks) Describe the end-to-end data flow in a LangChain + Azure AI Search RAG pipeline — from the user's question to the final generated answer. Identify ONE potential failure point at each stage and how you would mitigate it.
+Answer:
+In a LangChain + Azure AI Search RAG pipeline, the process begins when the user submits a query, which LangChain receives and preprocesses it. Here, a potential failure point is an ambiguous query, which can be mitigated through implementing query structure. 
+Next, the query is converted into an embedding and sent to Azure AI Search for semantic or vector retrieval. Here, a failure can occur if the embedding model does not capture the query's meaning correctly, which can be mitigated by selecting a domain-appropriate embedding model and regularly evaluating retrieval quality. 
+Azure AI Search then retrieves the most relevant documents from the indexed knowledge base. Here, a failure point is missing metadata, which can be mitigated through data quality checks and hybrid search methods. 
+LangChain then assembles the retrieved documents into a prompt context. Here, a failure can occur if context dilution happens, which can be mitigated through reranking, filtering, and chunk-size optimization. 
+The prompt is sent to the LLM, which generates the final answer. Here, a failure point is LLM hallucination, which can be mitigated by grounding responses strictly in retrieved content before returning the response to the user. 
+Then finally, this answer is sent to the user as the output.
+
+
+
+
+Day 13
+Q23. (5 marks) You are running a structured experiment comparing three LLMs on a Q&A task. Define FOUR metrics you would log for each run and explain what each metric tells you about model performance or suitability.
+Answer: 
+Four metrics to check for comparing multiple LLMs' performance are:
+Answer Accuracy: Measures if the model's response is correct compared to a ground-truth answer. High accuracy indicates the model can reliably answer questions correctly. 
+Response Latency: Measures the time taken from receiving the question to generating the final answer. This metric helps measure real-time turnabout time performance of each model, which is crucial for customer-facing apps.
+Token Usage: Tracks the number of tokens consumed during inference. Since most LLM services charge by the token, this metric allows us to keep track of the mounting cost and adjust accordingly.
+Hallucination Rate: Measures how often the model produces factually incorrect information. This metric is especially important for critical domains like healthcare and legal serious where incorrect information bears serious consequence. 
+
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Day 14
+Q24. (5 marks) A financial services company is deploying an LLM chatbot. Describe THREE guardrail mechanisms you would implement and explain how each guards against a specific harm (e.g., hallucination, bias, prompt injection, policy violation).
+Answer:
+RAG with Source Grounding: The chatbot must answer using only approved internal data sources. This guardrail primarily combats hallucinations, which might lead to financial loss if not countered. By grounding responses to verified sources, the chatbot returns more accurate and verifiable information.
+Prompt Injection Filters: User inputs  must be checked for any instruction to override the system's internal prompts or extract confidential information from the model. Suspicious prompts, which might be attempts to inject harmful prompts, can be blocked or sent for review instead of sending it to the LLM model.
+3. Output Moderation: Every generated response must pass through a post-processing layer that checks for prohibited content, complaince violations, or unparliamentary language. For example, the system can block answers which might contain an excerpt from a document that the company deems to be private, before it is displayed to the user who sent in a prompt. This helps counter any company compliance or local/global legal vulnerabilities.
+
+
+
+
+
+Day 15
+Q25. (5 marks) Explain the concept of multi-model routing. Describe a real-world scenario where you would route between Claude, Azure OpenAI, and a HuggingFace model, justifying each routing decision with a technical or business reason.
+Answer:
+Multi-model routing is an architectural design where an orchestration layer dynamically selects the most appropriate AI model for a given request instead of sending all requests to a single model. The routing decision is usually based on task type, task complexity, latency requirements, or data sensitivity. The goal is to optimize performance, cost, and reliability while leveraging the strengths of different models.
+For example, assuming the scenario where a single chatbot is responsible for receiving all user queries. 
+Here, when a user asks for help with a complex or nuanced subject relating to the company policy, the chatbot might redirect it to the Claude model, which is good for extracting information from long files on compliance and returns a detailed, structured output.
+If the customer asks for details steps on how to do something, for eg. Registering a product warrant, the chatbot might redirect this query to Azure OpenAI. This model is suited for this because it is capable of handling requests which require a strong backend scaffolding that is held by Azure, and it provides great security and availability, so that the customer is not left hanging at any time of the day.
+If the customer then logs a ticket, a Hugging Face Model can be called on to classify it into the proper processing bucket. This models is cheaper than the others and hence can be more useful for bulk tasks, especially if the company sees a high traffic of such tickets.
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+SECTION B — Case Study & Applied Analysis
+Instructions: Read the case study carefully and answer ALL sub-questions. Total marks for this section: 25.
+Total: 25 Marks | Suggested Time: 35 Minutes
+CASE STUDY: FinSight AI — A Regulatory Intelligence Platform
+FinSight AI is a regulatory intelligence startup building a platform for compliance teams at banks and insurance firms. The platform must process large volumes of regulatory documents (Basel IV, IFRS 17, local central bank circulars) and answer specific compliance questions from analysts.
+
+The engineering team has already completed the following:
+A LangChain-based summarisation pipeline for regulatory PDFs using Claude
+An Azure AI Search index populated with 50,000 document chunks (vector + keyword search)
+A basic RAG Q&A chain answering questions about uploaded circulars
+An initial prompt template library with three variants for Q&A, summarisation, and classification
+
+However, the team is now facing three critical challenges:
+1. Analysts report that answers sometimes contain plausible-sounding but incorrect regulatory clause numbers (hallucination).
+2. A stress test revealed that the pipeline fails silently when a query matches no relevant chunks (zero-retrieval scenario).
+3. The platform will expand to serve clients in the EU (requiring GDPR compliance) and must integrate with both Azure OpenAI (enterprise clients) and the Claude API (research teams), with a cost-routing layer that sends simple queries to cheaper models.
+
+Case Study Questions
+Sub-Question B1 — Day 12 & 13 [8 marks]
+B1. (8 marks) Diagnose and resolve the hallucination problem (Challenge 1) and the zero-retrieval failure (Challenge 2).
+For Challenge 1: Propose TWO prompt-engineering or pipeline changes that reduce factual hallucination in regulatory clause citation. Explain the mechanism behind each fix. [4 marks]
+For Challenge 2: Design a fallback strategy for zero-retrieval scenarios. Include: (a) how to detect a zero-retrieval condition, (b) what the system should do instead, and (c) how you would log and alert on this condition. [4 marks]
+Answer:
+Challenge 1: 
+This could be happening because the model might be trying to patch gaps in the information it retrieves with its baseline pre-training data. Mandating citations should force the model to ground itself and hence reduce hallucinations.
+Solution: Modify the internal prompt so that the model only cites clauses that appeared in the retrieved documents (mandate citation). Mandate that every answer must include supporting citations from the text. Also ensure that the instruction to 'say you do not know the answer if no relevant information is returned' is included in this prompt to the system.
+Then, add a post-verification later between the model returning an answer and it being served to the user. This layer must validate that each citation given in the answer actually exists in the dataset, and send on the answer only if all citations are valid.
+For edge cases, we can check if we are only hallucinating because the source dataset has inconsistent formatting or OCR from scanned documents is failing. For these, we should clean and standardise the initial dataset better.
+
+Challenge 2:
+If a query ends up with zero-retrieval, the system must inform that to the user and raise an error. This should trigger both when there are no chunks found and when all retrieved chunks fall short of a pre-defined relevancy score.
+a. To determine when a zero-retrieval situation occurs, the error workflow must be triggered both when there are no chunks found and when all retrieved chunks fall short of a pre-defined relevancy score. For example, we could have a code like: { if retrieved_chunks == 0 or similarity_score < 0.7: trigger zero-retrieval code path }
+b. Instead of generating an incorrect answer from insufficient context, the system must the user that no relevant  context was found. The user can then be given the option to reformat their query, use synonyms or more verbose explanations. If this also fails, the query can either be directed to a human expert with a ticket raised for the user, or a generic 'no policy like that exists' message can be retured to the user.
+c. We can create monitoring metrics like zero-retrieval rate, log the query, the timing, the answer initially returned, the similarity scores etc, and highest zero-retrieval topics. We can create a system alert when zero-retrieval events exceed a daily threshold, and send a simultaneous to the development team through monitoring tools and media channels like slack. This would encourage prompt action.
+
+Additionally, we can also check if we are failing similarity checks only because we are fetching partial context through ill-cut chunks, wherein fetching the neighbouring chunks might solve the issue.
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Sub-Question B2 — Day 14 [7 marks]
+B2. (7 marks) The platform handles sensitive financial data and must meet GDPR requirements. Design a content moderation and safety layer for the FinSight AI pipeline.
+Your answer must cover:
+At least TWO input guardrails (what you check BEFORE sending to the LLM)
+At least TWO output guardrails (what you validate AFTER the LLM responds)
+How you would evaluate the guardrail system for bias — specifically, whether the same regulatory question gets filtered differently based on the geographic entity mentioned (e.g., EU vs. US vs. Asian banks)
+
+Answer:
+The content moderation and safety layer should be kept both before and after the LLM call. Due to the financial sector being in play, GDPR rules must be satisfied. These guardrails should be included in the system prompt in the backend, and both incoming queries and outgoing responses must be checked rigorously.
+User Query -> [PII Detection] -> [Prompt Injection Filter] -> [Regulatory Scope Check] -> Azure AI Search / RAG -> LLM (Claude / Azure OpenAI) -> [Citation Verification] -> [PII & Data Leakage Scan] -> [Compliance Policy Check] -> User Response 
+
+Input Guardrails:
+Before sending to the LLM, we mustcheck for potentially identifiable information such as customer name, bank details, addressed, etc and anonymise/mask that or reject the query altogether. We should also retain this incident as a log for audit purposes. We must specifically be careful of missing personal data in OCR scan fails or misspelled fields. This will help us adhere to GDPR and not leak sensitive customer details.
+We should, at this stage, also check for harmful prompt injection attempts, like ones looking for sensitive data revelation or attempting to coax the LLM into performing unlawful activities. We should block thse requests, raise an incident log and strip the query of any suspicious phrasing. If this is not sufficient we should involve a human in the loop to double check such prompts.
+
+Output Guardrails:
+After receiving the output from the LLM we must verify, if the LLM is providing real, existing citations (we should bake the citations mandate into the ;system prompt itself) and block the answer in case of hallucinations. We should also use pattern matching techniques to ensure that no personal data of any customer or company emplyee has accidentally snuck into the response. If it has, we must either regenerate the response or mask/anonymise the sensitive details before providing the output to the user.
+
+Geographical Filtering:
+We should use a query filter rate (% of incidents raised) by location, and track how many incidents are odccusing in each region. This should reveal if there is any bias in the system and help us fix it.
+
+
+Sub-Question B3 — Day 15 [10 marks]
+B3. (10 marks) Design the multi-model architecture for Challenge 3 — integrating Claude API, Azure OpenAI, and HuggingFace with a cost-routing layer.
+Your answer must include:
+A routing decision matrix (you may draw a table or flowchart description) mapping query complexity / type to the appropriate model provider
+How CI/CD pipelines would be structured to safely deploy prompt or routing logic changes without breaking production
+ONE concrete best practice each for: (a) secrets/credential management, (b) observability/logging across multiple providers, (c) graceful degradation when one provider is unavailable
+Confidential — For Assessment Use Only                                                                                          Page
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Answer:
+
+To support Azure OpenAI (enterprise clients), Claude API (research/compliance teams), and HuggingFace models (cost optimization), the company must  implement a model orchestration layer that sits between the application and the model providers. The orchestration layer classifies each request and selects the most appropriate model based on complexity, cost, and latency. 
+
+User Query -> Query Classifier -> Complexity Assessment -> Routing Layer -> {HuggingFac, Azure OpenAI, Claude} -> Validation + Guardrails -> Response
+
+
+Query Type
+Complexity
+Model
+Justification
+Ticket classification
+Low
+HuggingFace
+Fast, cheap
+Document tagging
+Low
+HuggingFace
+Deterministic
+Simple FAQ from retrieved chunks
+Low
+Azure OpenAI
+Enterprise support 
+Regulatory Q&A with citations
+Medium
+Azure OpenAI
+Strong RAG integration
+Multi-document compliance analysis
+High
+Claude
+Excellent long-context reasoning across multiple documents
+Summarization of long regulatory PDFs
+High
+Claude
+Can handle long-context well
+
+Code Change -> Git PR -> Automated Testing Suite -> Prompt and Routing Evaluation Suite -> Staging -> Canary Deployment -> Production
+^This CI/CD pipeline ensures thatany change is well-tested before deployment to a financially critical zone without breaking production code, since those kind of errors will be caught early.
+
+a. Best place to store keys and secrects will be the Azure key vault. It enforces secret rotations, enhances availability and data security.
+b. For logging we can use a centralised logging appraoch with a common schema and store it in Azure. This way it will be available to all stakeholders, and advances analytics can be done on it as well.
+c. We should allow the routing logic to fallback to multiple models (arranged in order or priority for each routing path) and if all the models are simultaneously down, then provide a polite, apologetic message to the user.
+
+
+
+
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+SECTION C — Hands-On / Code Task
+Instructions: Complete ALL three tasks. You may use Python. Show your code, expected output, and a brief explanation of your approach. Partial credit is awarded for correct reasoning even if the code is incomplete.
+Total: 40 Marks | Suggested Time: 45 Minutes
+Task C1 — Day 11 & 12 [10 marks]
+C1. LangChain Prompt & RAG Chain
+Part A (4 marks): Write a Python function using LangChain's PromptTemplate that creates a summarisation prompt with two variables: {document_text} and {max_words}. The prompt must instruct the model to summarise in bullet points and cap the output at the specified word count.
+Part B (6 marks): Extend the function to build a minimal RAG Q&A chain using LangChain's RetrievalQA with a mock retriever (you may use a SimpleRetriever or an in-memory vector store with 3 sample documents). The chain should:
+Accept a user question
+Retrieve the top-2 relevant chunks
+Append them to the prompt context
+Return the model's answer along with the source chunk indices
+
+Write your code below:
+Write your code below:
+Part A:
+```
+#C1-A
+from langchain_core.prompts import PromptTemplate
+
+def create_summarization_prompt():
+    """
+    Creates a summarization prompt with variables:
+    - document_text
+    - max_words
+    """
+    
+    template = """
+    You are a helpful assistant.
+
+    Summarize the following document in concise bullet points.
+    Ensure that:
+    - The summary is written as bullet points.
+    - The total output does not exceed {max_words} words.
+
+    Document:
+    {document_text}
+
+    Summary:
+    """
+
+    prompt = PromptTemplate(
+        input_variables=["document_text", "max_words"],
+        template=template
+    )
+
+    return prompt
+
+prompt = create_summarization_prompt()
+
+formatted_prompt = prompt.format(
+    document_text="Artificial Intelligence (AI) is a technology that enables machines and computers to perform tasks that typically require human intelligence. It allows systems to learn from data, recognize patterns, and make decisions to solve complex problems. AI is a subset of machine learning, which is the method to train a computer to learn from its inputs but without explicit programming for every circumstance. Machine learning helps a computer achieve artificial intelligence. Nvidia's Huang pledges AI will boost manufacturing jobs. A test will come in Texas • June 16, 2026, 6:06 PM ET (AP) artificial intelligence (AI), the ability of a digital computer or computer-controlled robot to perform tasks commonly associated with intelligent beings. The term is frequently applied to the project of developing systems endowed with the intellectual processes characteristic of humans, such as the ability to reason, discover meaning, generalize, or learn from past experience. Since their development in the 1940s, digital computers have been programmed to carry out very complex tasks—such as discovering proofs for mathematical theorems or playing chess —with great proficiency. Despite continuing advances in computer processing speed and memory capacity, there are as yet no programs that can match full human flexibility over wider domains or in tasks requiring much everyday knowledge. On the other hand, some programs have attained the performance levels of human experts and professionals in executing certain specific tasks, so that artificial intelligence in this limited sense is found in applications as diverse as medical diagnosis, computer search engines, voice or handwriting recognition, and chatbots.",
+    max_words=100
+)
+
+print(formatted_prompt)
+```
+
+Part B:
+```
+#C1-B
+from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
+from langchain_community.vectorstores import FAISS
+from langchain_classic.chains import RetrievalQA
+from langchain_community.embeddings import FakeEmbeddings
+from langchain_community.llms.fake import FakeListLLM
+
+def build_rag_chain():
+    # Sample documents
+    docs = [
+        Document(
+            page_content="LangChain is a framework for building LLM applications.",
+            metadata={"chunk_id": 0}
+        ),
+        Document(
+            page_content="Retrieval-Augmented Generation combines retrieval with generation.",
+            metadata={"chunk_id": 1}
+        ),
+        Document(
+            page_content="FAISS is commonly used as a vector store for similarity search.",
+            metadata={"chunk_id": 2}
+        )
+    ]
+
+    # In-memory vector store
+    embeddings = FakeEmbeddings(size=128)
+    vectorstore = FAISS.from_documents(docs, embeddings)
+
+    # Retrieve top-2 chunks
+    retriever = vectorstore.as_retriever(
+        search_kwargs={"k": 2}
+    )
+
+    # Custom prompt
+    qa_prompt = PromptTemplate(
+        input_variables=["context", "question"],
+        template="""
+        Use the provided context to answer the question.
+
+        Context:
+        {context}
+
+        Question:
+        {question}
+
+        Answer:
+        """
+    )
+
+    # Mock LLM (replace with OpenAI(), ChatOpenAI(), etc.)
+    llm = FakeListLLM(
+        responses=[
+            "LangChain supports Retrieval-Augmented Generation by combining retrieved documents with an LLM."
+        ]
+    )
+
+    # RetrievalQA chain
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=retriever,
+        chain_type="stuff",
+        chain_type_kwargs={"prompt": qa_prompt},
+        return_source_documents=True
+    )
+
+    return qa_chain
+
+def ask_question(question):
+    chain = build_rag_chain()
+
+    result = chain({"query": question})
+
+    # Extract source chunk indices
+    source_indices = [
+        doc.metadata["chunk_id"]
+        for doc in result["source_documents"]
+    ]
+
+    return {
+        "answer": result["result"],
+        "source_chunk_indices": source_indices
+    }
+
+# Example
+response = ask_question(
+    "What is Retrieval-Augmented Generation?"
+)
+
+print("Answer:", response["answer"])
+print("Sources:", response["source_chunk_indices"])
+```
+
+
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Brief explanation of approach:
+C1-A:
+Used Langchain's PromptTemplate to create a reusable prompt. We defined two variables document_text and max_words and then instructed the model to generate the summary as bullet points, and keep the response within the maximum word limit.
+
+C1-B:
+First we created a small database using three sample documents, that we stored in a FAISS in-memory vector store.We then configured the retriever to fetch the top-2 most relevant chunks. We then chained the following to chain where we take a user query, retrieve relevant chunks and insert the retrieved context into the prompt, then use an LLM to generate an answer. Then we return the generarted answer and the indices of the source chunks used.
+
+
+
+
+
+Task C2 — Day 13 & 14 [10 marks]
+C2. Experiment Logging & Guardrail Implementation
+Part A (5 marks): Write a Python function run_experiment(prompt, models, temperatures) that:
+Calls each model with each temperature setting
+Logs: model name, temperature, latency (ms), output length (tokens), and a human-readable evaluation label ('pass'/'fail') to a list of dicts
+Returns the log as a pandas DataFrame
+
+Part B (5 marks): Write a Python function moderate_output(text) that implements TWO guardrails:
+Guardrail 1: A keyword/regex filter that flags outputs containing financial advice disclaimers the model should not generate (e.g., 'This is not financial advice' should NOT appear in compliance summaries — flag if absent)
+Guardrail 2: A length-based heuristic that flags outputs shorter than 50 words as likely incomplete
+The function should return a dict: {'passed': bool, 'flags': [list of triggered rules]}
+
+Write your code below:
+Write your code below:
+Part A:
+```
+#C2-A
+import time
+import pandas as pd
+
+def run_experiment(prompt, models, temperatures):
+    """
+    Args:
+        prompt (str): Input prompt
+        models (dict): {"model_name": model_object}
+        temperatures (list): List of temperature values
+
+    Returns:
+        pandas.DataFrame
+    """
+
+    logs = []
+
+    for model_name, model in models.items():
+        for temperature in temperatures:
+
+            start_time = time.time()
+
+            # Example invocation
+            response = model.invoke(
+                prompt,
+                temperature=temperature
+            )
+
+            latency_ms = (time.time() - start_time) * 1000
+
+            # Approximate token count using whitespace split
+            output_length = len(response.split())
+
+            evaluation = (
+                "pass"
+                if output_length >= 50
+                else "fail"
+            )
+
+            logs.append({
+                "model_name": model_name,
+                "temperature": temperature,
+                "latency_ms": round(latency_ms, 2),
+                "output_length_tokens": output_length,
+                "evaluation": evaluation
+            })
+
+    return pd.DataFrame(logs)
+```
+Part B:
+```
+#C2-B
+import re
+
+def moderate_output(text):
+    """
+    Returns:
+    {
+        'passed': bool,
+        'flags': [list of triggered rules]
+    }
+    """
+
+    flags = []
+
+    # Guardrail 1:
+    # Required disclaimer must be present
+    disclaimer_pattern = r"\bThis is not financial advice\b"
+
+    if not re.search(disclaimer_pattern, text, re.IGNORECASE):
+        flags.append("missing_financial_disclaimer")
+
+    # Guardrail 2:
+    # Output should be at least 50 words
+    word_count = len(text.split())
+
+    if word_count < 50:
+        flags.append("output_too_short")
+
+    return {
+        "passed": len(flags) == 0,
+        "flags": flags
+    }
+```
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Brief explanation of approach:
+
+C2-A:
+We first iterate through every model and temperature combination. We send the test prompt to each model, and compute the latency and output length. We also apply a simple evaluation rule of pass or fail and store the results in a list of dictionaries containing the model name, temperature, latency, output length and evaluation result. We return this as a structured dataframe.
+
+C2-B:
+We create a moderation function that checks generated text against predefined rules. Here the first guardrail is to keyword matching to verify the presence of the required disclaimer of "This is not financial advice", and flag the output if the disclaimer is missing. The second guardrail we implemented is to flag responses shorter than 50 words as potentially incomplete.
+
+
+
+Task C3 — Day 15 [10 marks]
+C3. Multi-Model Router
+Write a Python class ModelRouter that:
+Accepts a query string and classifies it as: 'simple' (factual, short), 'analytical' (requires reasoning), or 'creative' (open-ended generation)
+Routes 'simple' queries to HuggingFace (mock call), 'analytical' queries to Claude API, and 'creative' queries to Azure OpenAI (mock call)
+Implements a fallback: if the primary provider raises an exception, retries once with the secondary provider and logs the failover event
+Returns a dict: {'query': str, 'classified_as': str, 'provider_used': str, 'response': str, 'failover': bool}
+Bonus (+2 marks): Add a simple cost estimator that returns the estimated token cost per provider based on a configurable price-per-1k-tokens dict.
+Write your code below:
+Write your code below:
+
+```
+#C3
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+class ModelRouter:
+
+    def __init__(self, price_per_1k_tokens=None):
+        """
+        Bonus: configurable token pricing
+        """
+
+        self.price_per_1k_tokens = price_per_1k_tokens or {
+            "huggingface": 0.002,
+            "claude": 0.015,
+            "azure_openai": 0.010
+        }
+
+        # Primary -> Secondary failover mapping
+        self.fallbacks = {
+            "huggingface": "claude",
+            "claude": "azure_openai",
+            "azure_openai": "huggingface"
+        }
+
+    # -------------------------
+    # Query Classification
+    # -------------------------
+
+    def classify_query(self, query):
+        query_lower = query.lower()
+
+        creative_keywords = [
+            "story", "poem", "creative",
+            "write", "generate", "imagine"
+        ]
+
+        analytical_keywords = [
+            "analyze", "compare",
+            "evaluate", "reason",
+            "why", "tradeoff"
+        ]
+
+        if any(word in query_lower for word in creative_keywords):
+            return "creative"
+
+        if any(word in query_lower for word in analytical_keywords):
+            return "analytical"
+
+        return "simple"
+
+    # -------------------------
+    # Mock Providers
+    # -------------------------
+
+    def call_huggingface(self, query):
+        """
+        Mock HF call
+        """
+        return f"[HF] Answer for: {query}"
+
+    def call_claude(self, query):
+        """
+        Mock Claude call
+        """
+        return f"[Claude] Analysis for: {query}"
+
+    def call_azure_openai(self, query):
+        """
+        Mock Azure OpenAI call
+        """
+        return f"[Azure OpenAI] Creative response for: {query}"
+
+    # -------------------------
+    # Provider Dispatcher
+    # -------------------------
+
+    def invoke_provider(self, provider, query):
+
+        if provider == "huggingface":
+            return self.call_huggingface(query)
+
+        elif provider == "claude":
+            return self.call_claude(query)
+
+        elif provider == "azure_openai":
+            return self.call_azure_openai(query)
+
+        raise ValueError(f"Unknown provider: {provider}")
+
+    # -------------------------
+    # Bonus: Cost Estimation
+    # -------------------------
+
+    def estimate_cost(self, provider, text):
+        """
+        Approximate token count via whitespace split
+        """
+
+        tokens = len(text.split())
+
+        cost = (
+            tokens / 1000
+        ) * self.price_per_1k_tokens.get(provider, 0)
+
+        return round(cost, 6)
+
+    # -------------------------
+    # Main Routing Logic
+    # -------------------------
+
+    def route(self, query):
+
+        classification = self.classify_query(query)
+
+        if classification == "simple":
+            primary_provider = "huggingface"
+
+        elif classification == "analytical":
+            primary_provider = "claude"
+
+        else:
+            primary_provider = "azure_openai"
+
+        failover = False
+
+        try:
+            response = self.invoke_provider(
+                primary_provider,
+                query
+            )
+
+            provider_used = primary_provider
+
+        except Exception as e:
+
+            failover = True
+
+            secondary_provider = self.fallbacks[
+                primary_provider
+            ]
+
+            logging.warning(
+                f"Failover triggered: "
+                f"{primary_provider} -> "
+                f"{secondary_provider}"
+            )
+
+            response = self.invoke_provider(
+                secondary_provider,
+                query
+            )
+
+            provider_used = secondary_provider
+
+        return {
+            "query": query,
+            "classified_as": classification,
+            "provider_used": provider_used,
+            "response": response,
+            "failover": failover,
+            "estimated_cost": self.estimate_cost(
+                provider_used,
+                response
+            )
+        }
+```
+
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+Brief explanation of approach:
+C3:
+We built a ModelRouter class responsible for query classification and routing. We classify incomping queries into Simple (HuggingFace), Analytical (Claude) or Creative (Azure OpenAI) and route it to the mentioned models. We also implement a failsafe mechanism where, if the primary LLM call fails, we log the event for monitoring and call the next LLM in the list. We also return detailed logs of the response, such as the query, classification, fail status and LLM used. We also include the estimated cost per 1000 tokens here.
+
+
+
+
+
+Confidential — For Assessment Use Only                                                                                          Page
+
+MILESTONE ASSESSMENT 3 | Gen AI Industry Collaboration (Days 11–15)   Marks: 100 | Duration: 2 Hours
+
+MARKING RUBRIC — QUICK REFERENCE
+Section
+Max Marks
+Marking Criteria Summary
+A — Short Answer
+25
+5 marks each. Award: 5=comprehensive & accurate, 4=mostly correct minor gaps, 3=partially correct, 2=some relevant points, 1=minimal relevant content, 0=incorrect/blank.
+B1 — Case Study
+8
+4 marks per sub-part. Award marks for: correct diagnosis (1), mechanism explained (1), practical solution (1), edge case considered (1).
+B2 — Case Study
+7
+Input guardrails (2), output guardrails (2), bias evaluation method (2), coherence (1).
+B3 — Case Study
+12
+Routing matrix (4), CI/CD structure (4), 3 best practices (3), clarity (1).
+C1 — Code
+14
+Part A: correct PromptTemplate syntax (3), correct variables (2), bullet/word-count instruction (2). Part B: retriever setup (3), top-k retrieval (1), source indices returned (1), chain runs without error (1), explanation (1).
+C2 — Code
+13
+run_experiment: model loop (1), correct metrics logged (3), DataFrame returned (2), handles errors (1). moderate_output: guardrail 1 correct (3), guardrail 2 correct (2), dict format (1).
+C3 — Code
+13
+Classification logic (3), routing logic (4), fallback/retry (4), return dict format (1), explanation (1). Bonus: cost estimator (+2, capped at 13).
+
+
+— END OF ASSESSMENT —
+Milestone Assessment 3 | Gen AI Industry Collaboration (Days 11–15) | 100 Marks / 2 Hours
+Confidential — For Assessment Use Only                                                                                          Page

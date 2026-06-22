@@ -49,10 +49,7 @@ class AgentState(TypedDict):
     retry_count: int
     revision_feedback: str
 
-
 class Router(BaseModel):
-    """Supervisor routing decision"""
-
     next_worker: Literal[
         "researcher",
         "writer",
@@ -62,11 +59,6 @@ class Router(BaseModel):
     instructions: str = Field(
         description="Instructions for worker"
     )
-
-    is_critical: bool = Field(
-        description="Whether human review is required"
-    )
-
 
 # ============================================================
 # LLM + TOOLS
@@ -142,7 +134,7 @@ def supervisor(state: AgentState):
 
     - If no research exists -> researcher
     - If research exists but draft missing -> writer
-    - If draft exists -> FINISH
+    - FINISH
     """
 
     decision = structured_llm.invoke(prompt)

@@ -1,0 +1,11 @@
+Scenario 1:
+Framework: LangFlow, since it lets non-engineers build in a no-code environment.
+
+Scenario 2:
+Framework: CrewAI, since its built for role-based, sequential, multi-agent workflows, for fast shipping.
+
+Scenario 3:
+Framework: MS Autogen, since it natively supports multi-agent conversations with iterative back-and-forth and has built-in code execution/sandbozing for self-debugging loops.
+
+Scenario 4:
+Framework: LangGraph, since it provides stateful workflows, checkpointing and human-in-the-loop approvals.

@@ -1,0 +1,27 @@
+Personalised Product Recommendation Email:
+Single Agent, since tasks share a single context and there's a hard latency upper bound.
+
+---------------------------------------------------------
+{6-month History} -> {Collaborative Filtering} -> {Apply business rules} -> {Synthesize Introductory Paragraph} -> {Assemble Email HTML} -> {Send Emails}
+---------------------------------------------------------
+
+Automated Radiology Report + Care Pathway:
+Multi Agent, since tasks are distinct and there is no hard latency stop guideline.
+
+---------------------------------------------------------
+{CT Scan} -> {Parallelly: Draft Finding Report, Cross-check Findings with Patient History, Book Recommended Follow-up, Draft GP letter and Patient-facing Summary} -> {Return Consolidated Report}
+---------------------------------------------------------
+
+M&A Due Diligence:
+Single Agent, since the bound on turnaround time is specified and the documents are interdependent at the sysnthesis stage.
+
+---------------------------------------------------------
+{Documents Uploaded} -> {Extract Risk Clauses from Each Document, internally parallel} -> {Identify inter-contract dependencies} -> {Create Executive Risk Summary}
+---------------------------------------------------------
+
+Incident Triage and Auto-Remediation:
+Multi Agent, since the tasks required are interdependent.
+
+---------------------------------------------------------
+{Receive Alert} -> {Parallelly: Query Metrics, Check Deployment Logs, Query AWS RDS} -> {If confident/with Human Approval, execute Rollback/Pod Restart} -> {Post Structured RCA}
+---------------------------------------------------------

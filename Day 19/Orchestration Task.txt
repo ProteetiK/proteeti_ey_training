@@ -1,0 +1,20 @@
+Claims Adjudication:
+Orchestration: Magentic, since the tasks are independent but need an orchestrator to bring it together.
+
+----------------------------------------------------------
+Claim -> Orchestrator -> [Parallel: Fraud Screening, Policy Coverage, Medical-Coding Review] -> Orchestrator -> Decision
+----------------------------------------------------------
+
+Buyer's Research Assistant:
+Orchestration: Swarm/Handoff, since tasks needed are ambiguous and the agents can communicate amongst themselves to decide the required flow.
+
+----------------------------------------------------------
+User Query → [Research Agent <-> Product Agent <-> Pricing Agent <-> Review Agent] -> Recommendation
+----------------------------------------------------------
+
+RFP Response Builder:
+Orchestration: Graphflow, since the tasks are run in order and might have loops.
+
+----------------------------------------------------------
+RFP -> Requirement Analysis -> [Technical + Pricing + Compliance -> Review <-> Revise if needed -> Final Proposal
+----------------------------------------------------------

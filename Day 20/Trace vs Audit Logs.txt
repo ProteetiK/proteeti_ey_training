@@ -1,0 +1,15 @@
+Ticket: 04/08
+Observability: Trace/Spans
+Justification: We need a single failed request from a particular point in workflow, so a detailed log aas traces will be needed.
+
+Ticket: 05/08
+Observability: Trace/Spans
+Justification: We need aggregations of cost and tokens which we can get only from detailed logs.
+
+Ticket: 06/08
+Observability: Audit Log
+Justification: We need the data to survive for a long time, so an audit log, which retains data long-time, is suitable.
+
+Ticket: 08/08
+Observability: Both
+Justification: The trace logs are required for technical debugging and audit logs are needed for long-term compliance.
